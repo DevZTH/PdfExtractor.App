@@ -1,0 +1,63 @@
+name: Build and test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux-cross-build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Install build tools and Poppler
+        run: sudo apt-get update && sudo apt-get install -y nsis poppler-utils libfontconfig1
+      - name: Test extraction and GUI
+        run: dotnet test tests/PdfExtractor.Tests/PdfExtractor.Tests.csproj -c Release
+      - name: Cross-build Linux and Windows installer on Linux
+        run: bash scripts/build.sh all
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers
+          path: |
+            artifacts/PdfImageExtractor-Setup-x64.exe
+            artifacts/PdfImageExtractor-linux-x64.tar.gz
+            artifacts/PdfImageExtractor-source.tar.gz
+            artifacts/SHA256SUMS
+
+  windows-smoke-test:
+    needs: linux-cross-build
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: installers
+          path: artifacts
+      - name: Install the package produced on Linux
+        shell: pwsh
+        run: |
+          $installDir = Join-Path $env:RUNNER_TEMP 'PdfImageExtractor'
+          $installer = Start-Process 'artifacts/PdfImageExtractor-Setup-x64.exe' -ArgumentList @('/S', "/D=$installDir") -Wait -PassThru
+          if ($installer.ExitCode -ne 0) { throw "Installer exit code: $($installer.ExitCode)" }
+          $pdfimages = Join-Path $installDir 'poppler/Library/bin/pdfimages.exe'
+          if (!(Test-Path $pdfimages)) { throw 'Bundled pdfimages.exe is missing' }
+          "PDFIMAGES_PATH=$pdfimages" >> $env:GITHUB_ENV
+          "PDF_EXTRACTOR_INSTALL_DIR=$installDir" >> $env:GITHUB_ENV
+          & $pdfimages -v
+          if ($LASTEXITCODE -ne 0) { throw 'Bundled Poppler failed to start' }
+      - name: Test extraction and GUI with bundled Poppler on Windows
+        run: dotnet test tests/PdfExtractor.Tests/PdfExtractor.Tests.csproj -c Release
+      - name: Start self-contained Windows executable
+        shell: pwsh
+        run: |
+          $app = Start-Process (Join-Path $env:PDF_EXTRACTOR_INSTALL_DIR 'PdfImageExtractor.exe') -PassThru
+          Start-Sleep -Seconds 3
+          $app.Refresh()
+          if ($app.HasExited) { throw "Application exited: $($app.ExitCode)" }
+          Stop-Process -Id $app.Id

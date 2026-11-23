@@ -1,0 +1,33 @@
+The original PDF Image Extractor application is licensed under GPL-3.0-or-later.
+See LICENSE and COPYRIGHT. Third-party components retain their own licenses.
+
+PDF Image Extractor uses the following independent projects:
+
+.NET runtime — Microsoft and contributors — MIT
+https://github.com/dotnet/runtime
+Upstream license and third-party notices: https://github.com/dotnet/runtime
+
+Avalonia — AvaloniaUI and contributors — MIT
+https://github.com/AvaloniaUI/Avalonia
+
+SkiaSharp — Microsoft and contributors — MIT
+https://github.com/mono/SkiaSharp
+Skia — Google and contributors — BSD-3-Clause
+https://skia.googlesource.com/skia/
+HarfBuzz — HarfBuzz contributors — MIT
+https://github.com/harfbuzz/harfbuzz
+
+Poppler / pdfimages — Poppler developers, Glyph & Cog, LLC and contributors
+GNU GPL; see the matching upstream source for the applicable license terms.
+Run as a separate command-line process.
+https://poppler.freedesktop.org/
+Matching upstream source for the Windows bundle (Poppler 26.09.0):
+https://poppler.freedesktop.org/poppler-26.09.0.tar.xz
+Windows binary distribution and build instructions:
+https://github.com/oschwartz10612/poppler-windows/tree/v26.09.0-0
+Its bundled libraries and poppler-data have their own licenses.
+The original Poppler data copyright/license files are retained in the bundle.
+GPL-2.0 license text is included as poppler/share/poppler/COPYING.gpl2.
+
+NuGet package versions and hashes are recorded in the project's lock files.
+Their license metadata is in the corresponding NuGet packages (.nuspec files).

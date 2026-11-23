@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=PDF Image Extractor
+Name[ru]=Изображения из PDF
+Comment=Extract embedded images from PDF files
+Comment[ru]=Извлечение встроенных изображений из PDF
+Exec=PdfImageExtractor %F
+Icon=pdf-image-extractor
+Terminal=false
+Categories=Graphics;Utility;
+MimeType=application/pdf;
+StartupWMClass=PdfImageExtractor

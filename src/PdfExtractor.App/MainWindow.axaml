@@ -1,0 +1,95 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PdfExtractor.App.MainWindow"
+        Title="Изображения из PDF" Width="740" Height="900"
+        MinWidth="620" MinHeight="640" Background="#F4F6FA"
+        Icon="/Assets/app.ico" DragDrop.AllowDrop="True">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="24" Spacing="16">
+      <StackPanel Spacing="5">
+        <TextBlock Text="Изображения из PDF" FontSize="26" FontWeight="Bold" Foreground="#17233A" />
+        <TextBlock Classes="hint" Text="Выберите PDF или перетащите файлы в это окно." />
+      </StackPanel>
+
+      <Border Padding="18" Background="White" BorderBrush="#DCE3EF" BorderThickness="1" CornerRadius="10">
+        <StackPanel Spacing="10">
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <Button x:Name="ChoosePdfButton" Content="Выбрать PDF…" Click="ChoosePdf" HorizontalAlignment="Left" />
+            <Button x:Name="RemoveButton" Grid.Column="1" Content="Убрать" Click="RemoveFile" Margin="8,0" />
+            <Button x:Name="ClearButton" Grid.Column="2" Content="Очистить" Click="ClearFiles" />
+          </Grid>
+          <ListBox x:Name="FileList" Height="104" Background="#F8FAFE" BorderThickness="0"
+                   SelectionMode="Multiple"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.Styles>
+              <Style Selector="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="x:String">
+                <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}" />
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <TextBlock x:Name="FileCount" Classes="hint" Text="Файлы не выбраны. Можно добавить несколько PDF." />
+        </StackPanel>
+      </Border>
+
+      <Border Padding="18" Background="White" CornerRadius="10">
+        <StackPanel x:Name="SettingsPanel" Spacing="16">
+          <Grid ColumnDefinitions="*,20,*">
+            <StackPanel>
+              <TextBlock Classes="label" Text="Мин. ширина, пиксели" />
+              <NumericUpDown x:Name="MinWidthInput" Minimum="0" Maximum="1000000" Value="0"
+                             Increment="10" FormatString="0" AllowSpin="True" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Classes="label" Text="Мин. высота, пиксели" />
+              <NumericUpDown x:Name="MinHeightInput" Minimum="0" Maximum="1000000" Value="0"
+                             Increment="10" FormatString="0" AllowSpin="True" />
+            </StackPanel>
+          </Grid>
+          <TextBlock Classes="hint" Margin="0,-9,0,0" Text="Меньшие изображения пропускаются. 0 — без ограничения; проверяются оба размера." />
+          <Grid ColumnDefinitions="150,20,*">
+            <StackPanel>
+              <TextBlock Classes="label" Text="Формат" />
+              <ComboBox x:Name="FormatInput" SelectedIndex="0" HorizontalAlignment="Stretch">
+                <ComboBoxItem Content="JPEG (.jpeg)" />
+                <ComboBoxItem Content="PNG (.png)" />
+                <ComboBoxItem Content="WebP (.webp)" />
+                <ComboBoxItem Content="BMP (.bmp)" />
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Classes="label" Text="Шаблон имени" />
+              <TextBox x:Name="TemplateInput" Text="image_" Watermark="image_" />
+            </StackPanel>
+          </Grid>
+          <TextBlock Classes="hint" Margin="0,-9,0,0"
+                     Text="image_ → image_0001.jpeg. Можно использовать {pdf}, {page}, {index:0000}." />
+          <StackPanel Spacing="6">
+            <TextBlock Classes="label" Margin="0" Text="Папка сохранения" />
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBox x:Name="OutputInput" Watermark="Автоматически: папка с именем PDF рядом с файлом"
+                       TextChanged="OutputChanged" />
+              <Button Grid.Column="1" Content="Обзор…" Margin="8,0,0,0" Click="ChooseFolder" />
+            </Grid>
+            <TextBlock x:Name="OutputPreview" Classes="hint" Text="Пустое поле — отдельная папка для каждого PDF." />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <StackPanel Spacing="10">
+        <Grid ColumnDefinitions="*,Auto">
+          <Button x:Name="StartButton" Classes="primary" Content="Извлечь изображения" Click="StartExtraction" />
+          <Button x:Name="CancelButton" Grid.Column="1" Content="Отмена" IsEnabled="False" Click="CancelExtraction" />
+        </Grid>
+        <ProgressBar x:Name="Progress" Minimum="0" Maximum="100" Value="0" Height="5" />
+        <TextBlock x:Name="Status" Text="Готово к работе" TextWrapping="Wrap" Foreground="#34435C" />
+        <TextBox x:Name="Log" IsReadOnly="True" AcceptsReturn="True" Height="90" TextWrapping="Wrap"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" FontSize="12" />
+        <Button x:Name="OpenFolderButton" Content="Открыть папку с изображениями" IsVisible="False" Click="OpenOutputFolder" />
+      </StackPanel>
+      <TextBlock Classes="hint" Text="Извлекаются встроенные растровые изображения. JPEG и BMP сохраняют прозрачные области на белом фоне." />
+    </StackPanel>
+  </ScrollViewer>
+</Window>

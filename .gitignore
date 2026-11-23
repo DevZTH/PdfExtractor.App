@@ -1,0 +1,9 @@
+bin/
+obj/
+artifacts/
+vendor/poppler-windows/
+.tools/
+.nuget/
+.vs/
+TestResults/
+*.user
